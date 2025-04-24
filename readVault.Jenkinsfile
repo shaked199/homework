@@ -22,20 +22,21 @@ pipeline {
                         def json = readJSON text: vaultData
                         env.AWS_ACCESS_KEY_ID = json.data.data.aws_access_key_id
                         env.AWS_SECRET_ACCESS_KEY = json.data.data.aws_secret_access_key
-                        env.AWS_REGION = 'us-east-1'  // or read from Vault too
+                        env.AWS_REGION = 'il-central-1'  // or read from Vault too
                     }
                 }
             }
         }
         stage('Print EC2 Instance Names') {
     steps {
-        script {
-            withEnv([
+        withEnv([
                 "AWS_ACCESS_KEY_ID=${env.AWS_ACCESS_KEY_ID}",
                 
                 "AWS_SECRET_ACCESS_KEY=${env.AWS_SECRET_ACCESS_KEY}",
                 "AWS_REGION=${env.AWS_REGION}"
-            ]) {
+            ])
+        script {
+             {
                 sh '''
                     echo "Using AWS key: $AWS_ACCESS_KEY_ID"
                     echo "Fetching EC2 instance names..."
