@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         VAULT_ADDR = 'http://vault:8200'
-        VAULT_SECRET_PATH = 'jenkins/my-secret'
+        VAULT_SECRET_PATH = 'secret/data/jenkins/my-secret'  // <- fixed!
     }
 
     stages {
@@ -18,7 +18,7 @@ pipeline {
                 withCredentials([string(credentialsId: 'vault-jenkins-token', variable: 'VAULT_TOKEN')]) {
                     script {
                         def response = sh(
-                            script: """curl -s --header "X-Vault-Token: ${VAULT_TOKEN}" --request GET ${VAULT_ADDR}/v1/${VAULT_SECRET_PATH}/data""",
+                            script: """curl -s --header "X-Vault-Token: ${VAULT_TOKEN}" --request GET ${VAULT_ADDR}/v1/${VAULT_SECRET_PATH}""",
                             returnStdout: true
                         ).trim()
 
