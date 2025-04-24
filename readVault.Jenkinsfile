@@ -36,7 +36,7 @@ pipeline {
                 "AWS_REGION=${env.AWS_REGION}"
             ])
         script {
-             {
+             
                 sh '''
                     echo "Using AWS key: $AWS_ACCESS_KEY_ID"
                     echo "Fetching EC2 instance names..."
@@ -45,7 +45,7 @@ pipeline {
                       --query 'Reservations[*].Instances[*].Tags[?Key==`Name`].Value[]' \
                       --output text
                 '''
-                 }
+                 
              }
         }
         }   
