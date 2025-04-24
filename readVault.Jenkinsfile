@@ -2,14 +2,14 @@ pipeline {
     agent any
 
     environment {
-        VAULT_ADDR = 'http://vault:8200' 
+        VAULT_ADDR = 'http://vault:8200'
     }
 
     stages {
         stage('Read secret from Vault') {
             steps {
-                withCredentials([string(credentialsId: 'vault-jenkins-token', variable: 'VAULT_TOKEN')]) {
-                    script {
+                script {
+                    withCredentials([string(credentialsId: 'vault-jenkins-token', variable: 'VAULT_TOKEN')]) {
                         def vaultData = sh(
                             script: """
                             curl -s --header "X-Vault-Token:${VAULT_TOKEN}" --request GET \
@@ -18,12 +18,21 @@ pipeline {
                             returnStdout: true
                         ).trim()
 
+                        echo "Vault response: ${vaultData}"
+
                         def json = readJSON text: vaultData
 
-                    
-                        env.AWS_ACCESS_KEY_ID = json.data.data.aws_access_key_id
-                        env.AWS_SECRET_ACCESS_KEY = json.data.data.aws_secret_access_key
-                        env.AWS_REGION = 'il-central-1'
+                        
+                        def awsKey = json.data.data.aws_access_key_id
+                        def awsSecret = json.data.data.aws_secret_access_key
+                        def awsRegion = 'il-central-1'
+
+                        
+                        writeFile file: 'aws_env.sh', text: """
+                            export AWS_ACCESS_KEY_ID=${awsKey}
+                            export AWS_SECRET_ACCESS_KEY=${awsSecret}
+                            export AWS_REGION=${awsRegion}
+                        """
                     }
                 }
             }
@@ -32,12 +41,9 @@ pipeline {
         stage('Print EC2 Instance Names') {
             steps {
                 script {
-                   
-                    withEnv([
-                        "AWS_ACCESS_KEY_ID=${env.AWS_ACCESS_KEY_ID}",
-                        "AWS_SECRET_ACCESS_KEY=${env.AWS_SECRET_ACCESS_KEY}",
-                        "AWS_REGION=${env.AWS_REGION}"
-                    ]) {
+                 
+                    def awsEnv = readFile('aws_env.sh').split("\n").findAll { it }
+                    withEnv(awsEnv) {
                         sh '''
                             echo "Using AWS key: $AWS_ACCESS_KEY_ID"
                             echo "Fetching EC2 instance names..."
