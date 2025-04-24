@@ -27,27 +27,25 @@ pipeline {
                 }
             }
         }
-        stage('Print EC2 Instance Names') {
-    steps {
-        withEnv([
-                "AWS_ACCESS_KEY_ID=${env.AWS_ACCESS_KEY_ID}",
-                
-                "AWS_SECRET_ACCESS_KEY=${env.AWS_SECRET_ACCESS_KEY}",
-                "AWS_REGION=${env.AWS_REGION}"
-            ])
-        script {
-             
-                sh '''
-                    echo "Using AWS key: $AWS_ACCESS_KEY_ID"
-                    echo "Fetching EC2 instance names..."
-                    aws ec2 describe-instances \
-                      --region $AWS_REGION \
-                      --query 'Reservations[*].Instances[*].Tags[?Key==`Name`].Value[]' \
-                      --output text
-                '''
-                 
-             }
-        }
-        }   
+            stage('Print EC2 Instance Names') {
+                steps {
+                    script {
+                        withEnv([
+                            "AWS_ACCESS_KEY_ID=${env.AWS_ACCESS_KEY_ID}",
+                            "AWS_SECRET_ACCESS_KEY=${env.AWS_SECRET_ACCESS_KEY}",
+                            "AWS_REGION=${env.AWS_REGION}"
+                        ]) {
+                            sh '''
+                                echo "Using AWS key: $AWS_ACCESS_KEY_ID"
+                                echo "Fetching EC2 instance names..."
+                                aws ec2 describe-instances \
+                                --region $AWS_REGION \
+                                --query 'Reservations[*].Instances[*].Tags[?Key==`Name`].Value[]' \
+                                --output text
+                            '''
+                        }
+                    }
+                }
+            }
     }
 }
