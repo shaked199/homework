@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         VAULT_ADDR = 'http://vault:8200'
-        VAULT_SECRET_PATH = 'secret/data/jenkins/my-secret'  // <- fixed!
+        VAULT_SECRET_PATH = '/v1/jenkins/my-secret/data/jenkins/my-secret'  // <- fixed!
     }
 
     stages {
