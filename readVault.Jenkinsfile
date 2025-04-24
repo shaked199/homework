@@ -32,11 +32,12 @@ pipeline {
         script {
             withEnv([
                 "AWS_ACCESS_KEY_ID=${env.AWS_ACCESS_KEY_ID}",
-                echo "Using AWS key: $AWS_ACCESS_KEY_ID"
+                
                 "AWS_SECRET_ACCESS_KEY=${env.AWS_SECRET_ACCESS_KEY}",
                 "AWS_REGION=${env.AWS_REGION}"
             ]) {
                 sh '''
+                    echo "Using AWS key: $AWS_ACCESS_KEY_ID"
                     echo "Fetching EC2 instance names..."
                     aws ec2 describe-instances \
                       --region $AWS_REGION \
