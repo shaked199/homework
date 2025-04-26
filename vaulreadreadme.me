@@ -1,0 +1,59 @@
+# Vault Secret Reader Pipeline
+
+## Description
+This Jenkins pipeline demonstrates secure secret retrieval from HashiCorp Vault using Jenkins credentials. The pipeline uses a REST API call to fetch secrets stored in Vault.
+
+## Pipeline Components
+
+### Environment Configuration
+- Sets up Vault server address: `http://vault:8200`
+
+### Pipeline Stages
+1. **Read secret from Vault**
+   - Authenticates with Vault using Jenkins credentials
+   - Retrieves a specific secret using Vault's HTTP API
+   - Processes the response using `jq` to extract the key value
+
+## Prerequisites
+- Jenkins server with pipeline support
+- HashiCorp Vault server running and accessible
+- Jenkins Credentials Plugin installed
+- `curl` and `jq` installed on Jenkins agent
+- Vault token stored in Jenkins credentials with ID 'vault-jenkins-token'
+
+## Configuration Requirements
+
+### Jenkins Credentials
+- Credential ID: `vault-jenkins-token`
+- Type: Secret text
+- Content: Vault authentication token
+
+### Vault Configuration
+- Vault server running on port 8200
+- Secret path: `jenkins/my-secret/data/jenkins/my-secret`
+- Proper permissions set for the token
+
+## How It Works
+1. Pipeline starts and sets the Vault server address
+2. Retrieves the Vault token from Jenkins credentials
+3. Makes an HTTP GET request to Vault with proper authentication
+4. Extracts the secret value using jq
+5. Returns the secret value for further processing
+
+## Security Notes
+- Uses Jenkins credential store for secure token management
+- Implements proper HTTP headers for Vault authentication
+- Ensures secure communication with Vault server
+- the vault need to be unsealed first with 3 out of 5 unseal token that the owner got
+
+## Error Handling
+The pipeline includes:
+- Proper exit code handling from shell commands
+- Trimming of response to remove whitespace
+- Secure credential handling through Jenkins withCredentials block
+
+## Usage
+1. Create the Jenkins pipeline using this code
+2. Configure the required Jenkins credentials
+3. Ensure Vault server is accessible
+4. Run the pipeline to retrieve secrets

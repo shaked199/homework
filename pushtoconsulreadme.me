@@ -1,0 +1,102 @@
+# Consul Configuration Update Pipeline
+
+## Description
+This Jenkins pipeline automates the process of updating configuration values in HashiCorp Consul. It allows for dynamic updates of environment and version parameters through a parameterized Jenkins job.
+
+## Pipeline Features
+
+### Parameters
+1. **ENV**
+   - Purpose: Specifies the environment name
+   - Default value: 'dev'
+   - Type: String
+
+2. **VERSION**
+   - Purpose: Specifies the version to deploy
+   - Default value: '1.0.0'
+   - Type: String
+
+### Environment Variables
+- `CONSUL_HOST`: Consul server address (http://consul:8500)
+
+### Stages
+
+1. **Print Params**
+   - Displays the current parameter values
+   - Useful for verification and logging
+
+2. **Push to Consul**
+   - Updates two key-value pairs in Consul:
+     - `project/config/env`: Environment value
+     - `project/config/env`: Version value
+
+## Prerequisites
+- Jenkins server
+- Access to Consul server
+- `curl` installed on Jenkins agent
+- Network connectivity between Jenkins and Consul
+
+## Configuration Path
+Values are stored in Consul under:
+- `/v1/kv/project/config/env`
+
+## Usage
+
+### Running the Pipeline
+1. Navigate to the pipeline in Jenkins
+2. Click "Build with Parameters"
+3. Input desired values for:
+   - ENV
+   - VERSION
+4. Click "Build"
+
+### Example Values
+```bash
+ENV: production
+VERSION: 2.1.0
+Error Handling
+Pipeline will fail if:
+
+Consul is not accessible
+
+HTTP requests fail
+
+Invalid parameters are provided
+
+Security Considerations
+Ensure secure communication between Jenkins and Consul
+
+Implement proper access controls in Consul
+
+Consider using Consul ACL tokens for authentication
+
+Known Issues
+Both parameters are being pushed to the same Consul key path
+
+No validation of parameter values
+
+No error handling for failed requests
+
+Suggested Improvements
+Add proper error handling
+
+Implement parameter validation
+
+Add Consul ACL token authentication
+
+Fix duplicate key path issue
+
+Add response verification
+
+Implement rollback mechanism
+
+Pipeline Structure
+pipeline
+├── parameters
+│   ├── ENV
+│   └── VERSION
+├── environment
+│   └── CONSUL_HOST
+└── stages
+    ├── Print Params
+    └── Push to Consul

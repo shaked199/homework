@@ -1,0 +1,69 @@
+# AWS CLI v2 Installation Playbook
+
+## Description
+This Ansible playbook automates the installation of AWS CLI version 2 on Ubuntu servers. The playbook handles all necessary dependencies, downloads the installer, and verifies the installation.
+
+## Prerequisites
+- Ansible installed on the control node
+- Ubuntu target servers
+- Sudo privileges on target servers
+
+## Playbook Structure
+The playbook (`awscli.yml`) contains the following tasks:
+1. Installation of required dependencies (unzip, curl)
+2. Download of AWS CLI v2 installer
+3. Extraction of the installer
+4. Installation of AWS CLI
+5. Verification of installation
+
+## Tasks Breakdown
+1. **Install Dependencies**
+   - Installs unzip and curl packages
+   - Updates package cache
+
+2. **Download AWS CLI**
+   - Downloads the official AWS CLI v2 installer
+   - Saves to `/tmp/awscliv2.zip`
+   - Sets appropriate permissions (0644)
+
+3. **Extract Installer**
+   - Unzips the downloaded installer
+   - Extracts to `/tmp` directory
+
+4. **Install AWS CLI**
+   - Runs the installation script
+   - Creates binary in `/usr/local/bin/aws`
+   - Prevents reinstallation if AWS CLI is already present
+
+5. **Verification**
+   - Checks AWS CLI version
+   - Displays the installed version
+
+## How to Run
+Execute the playbook using:
+```bash
+ansible-playbook awscli.yml
+Configuration
+Target Hosts : The playbook targets hosts in the servers group
+
+Privileges : Requires sudo access (become: yes)
+
+Installation Path : AWS CLI will be installed in /usr/local/bin/aws
+
+Expected Outcome
+After successful execution:
+
+AWS CLI v2 will be installed
+
+The installation can be verified by running aws --version
+
+The playbook will display the installed AWS CLI version
+
+Notes
+Temporary files are stored in /tmp
+
+The playbook is idempotent and won't reinstall if AWS CLI is already present
+
+Installation files are cleaned up automatically
+
+

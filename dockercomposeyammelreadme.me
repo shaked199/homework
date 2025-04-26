@@ -1,0 +1,138 @@
+
+
+# DevOps Infrastructure Stack
+
+## Description
+This Docker Compose configuration sets up a complete DevOps infrastructure stack including Jenkins, HashiCorp tools (Vault and Consul), Docker Registry, Nginx, and AWS CLI.
+
+## Services Overview
+
+### 1. Jenkins
+- Base image: `jenkins/jenkins:latest`
+- Port mappings:
+  - 8080: Web interface
+  - 50000: Agent connection
+  - 2222: SSH
+- Custom configuration:
+  - Docker-in-Docker capability
+  - SSH key integration
+  - JQ installation
+  - Root user access
+
+### 2. Docker Registry (Artifactory)
+- Port: 5000
+- Purpose: Local container registry
+- Persistent storage: No
+- Network: shared_network
+
+### 3. Nginx (Web)
+- Port: 8090:9000
+- Custom configuration volume
+- Depends on Jenkins
+- Purpose: Web server/reverse proxy
+
+### 4. Consul
+- Ports:
+  - 8500: Web UI
+  - 8600: DNS (UDP)
+  - 8300: Server RPC
+  - 8301: Serf LAN
+  - 8302: Serf WAN
+- Configuration:
+  - Server mode
+  - Bootstrap mode
+  - UI enabled
+  - Datacenter: dc1
+- Persistent data volume
+
+### 5. HashiCorp Vault
+- Ports:
+  - 8200: API/UI
+  - 8201: Cluster
+- Environment configuration:
+  - VAULT_ADDR
+  - VAULT_API_ADDR
+  - VAULT_ADDRESS
+- Volumes:
+  - Logs
+  - Data
+  - Config
+  - File storage
+- Development mode enabled
+
+### 6. AWS CLI
+- Region: il-central-1
+- Mounted volumes:
+  - AWS credentials
+  - SSH keys
+  - Route53 configuration
+- Interactive shell enabled
+
+## Network Configuration
+- Custom network: `shared_network`
+- All services interconnected
+
+## Volumes
+1. jenkins_home: Jenkins data
+2. rabbitmq_data: RabbitMQ storage
+3. consul_data: Consul data
+
+## Prerequisites
+- Docker and Docker Compose installed
+- Sufficient disk space
+- Required ports available
+- AWS credentials (for AWS CLI container)
+- Vault configuration file
+- SSH keys for Jenkins
+
+## Usage
+
+### Starting the Stack
+```bash
+docker-compose up -d
+
+
+
+Accessing Services
+Jenkins: http://localhost:8080
+
+Consul UI: http://localhost:8500
+
+Vault UI: http://localhost:8200
+
+Registry: http://localhost:5000
+
+Nginx: http://localhost:8090
+
+Security Notes
+Jenkins runs as root (consider security implications)
+
+Docker socket mounted (provides full Docker access)
+
+SSH keys mounted into containers
+
+Vault running in dev mode (not for production)
+
+Maintenance
+Data persisted through named volumes
+
+All services configured to restart automatically
+
+Logs accessible through Docker logging
+
+Dependencies
+Services start order:
+
+Jenkins (primary service)
+
+Other services depend on Jenkins
+
+Configuration Files
+Required configuration files:
+
+Vault config at /home/shaked/vault/config/config.hcl
+
+Nginx config in ./my_conf
+
+AWS credentials in ~/aws
+

@@ -1,0 +1,104 @@
+# EC2 Route53 DNS Auto-Update System
+
+## Description
+This project automatically updates Route53 DNS records when an EC2 instance starts up. It creates/updates an A record with the instance's public IP address in a specified Route53 hosted zone.
+
+## Components
+
+### 1. DNS Update Script (`route53.sh`)
+A bash script that:
+- Retrieves the instance's current public IP
+- Gets the instance ID using IMDSv2
+- Fetches the instance's Name tag
+- Updates Route53 DNS record
+
+Key Features:
+- Uses IMDSv2 for enhanced security
+- Dynamic hostname based on EC2 instance tags
+- Configurable TTL (default: 300 seconds)
+- Error handling and logging
+- Zone name configuration: "aws.cts.care."
+
+### 2. Systemd Service (`update.service`)
+A systemd service unit that:
+- Runs the update script when the system boots
+- Executes after network connectivity is established
+- Runs as the ubuntu user
+- One-shot execution (doesn't persist)
+
+### 3. Ansible Deployment (`update_route.yml`)
+Ansible playbook that:
+- Copies the update script to EC2 instances
+- Installs the systemd service
+- Enables and starts the service
+
+## Prerequisites
+- AWS CLI installed and configured
+- Proper IAM permissions for:
+  - Route53 record modifications
+  - EC2 tag reading
+- EC2 instance with:
+  - Ubuntu operating system
+  - 'Name' tag configured
+  - Network access to Route53 API
+
+## Installation
+The Ansible playbook handles the installation automatically:
+```bash
+ansible-playbook update_route.yml
+
+
+File Permissions
+route53.sh: 755 (executable)
+
+update.service: 644 (readable)
+
+Service Operation
+The service:
+
+Starts automatically when the EC2 instance boots
+
+Retrieves the current public IP
+
+Updates the Route53 record
+
+Exits after completion
+
+Directory Structure:
+project/
+├── route53.sh         # DNS update script
+├── update.service     # Systemd service definition
+└── update_route.yml   # Ansible deployment playbook
+
+Error Handling
+The script includes checks for:
+
+Public IP retrieval
+
+IMDSv2 token acquisition
+
+Instance ID retrieval
+
+Name tag presence
+
+Route53 update success
+
+Security Considerations
+Uses IMDSv2 for enhanced metadata security
+
+Runs as non-root user (ubuntu)
+
+Proper file permissions
+
+Secure systemd service configuration
+
+Troubleshooting
+Check script logs: journalctl -u update.service
+
+Verify AWS CLI configuration
+
+Check IAM permissions
+
+Ensure network connectivity
+
+Verify instance Name tag exists

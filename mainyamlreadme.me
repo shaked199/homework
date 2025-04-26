@@ -1,0 +1,127 @@
+# Multi-Service Installation Ansible Playbook
+
+## Description
+This Ansible playbook automates the installation and configuration of multiple services including Nginx, Docker, MySQL, and JFrog Artifactory on Ubuntu servers.
+
+## Playbook Structure
+The playbook consists of three main plays:
+
+### 1. Nginx and Utilities Installation
+Installs basic system utilities and web server:
+- Nginx web server
+- Vim text editor
+- Network utilities (net-tools)
+- System statistics (sysstat/iostat)
+
+### 2. Docker and MySQL Installation
+Implements:
+- Docker installation using geerlingguy.docker role
+- MySQL installation using geerlingguy.mysql role
+- MySQL user configuration
+
+### 3. JFrog Artifactory Installation
+Sets up:
+- JFrog Artifactory using official collection
+- Basic Artifactory configuration
+
+## Prerequisites
+- Ansible installed on control node
+- Target Ubuntu servers
+- Sudo access on target servers
+- Network connectivity to targets
+
+## Required Roles and Collections
+```yaml
+Roles:
+- geerlingguy.docker
+- geerlingguy.mysql
+- artifactory
+
+Collections:
+- jfrog.platform
+
+
+
+Configuration Details
+Target Hosts
+All plays target the 'servers' group
+
+Remote user: ubuntu (except for artifactory)
+
+Requires sudo privileges (become: yes)
+
+MySQL Configuration
+Username: shaked
+
+Database privileges: ALL on my_database.*
+
+Default password configured
+
+Artifactory Configuration
+Enabled by default
+
+Uses default installation path
+
+Usage
+Running the Playbook
+ansible-playbook main.yml
+
+
+Verifying Installation
+Nginx: systemctl status nginx
+
+Docker: docker --version
+
+MySQL: mysql -u shaked -p
+
+Artifactory: Access web interface
+
+Package Versions
+Nginx: Latest from Ubuntu repositories
+
+Vim: Latest from Ubuntu repositories
+
+Net-tools: Latest from Ubuntu repositories
+
+Sysstat: Latest from Ubuntu repositories
+
+Docker: Version defined by geerlingguy.docker role
+
+MySQL: Version defined by geerlingguy.mysql role
+
+Artifactory: Latest from JFrog platform collection
+
+Security Notes
+MySQL password is hardcoded (should be changed in production)
+
+All services installed with default configurations
+
+Sudo privileges required for installation
+
+Maintenance
+All packages can be updated through standard Ubuntu package management
+
+Docker managed through Docker role
+
+Artifactory updates handled through JFrog platform
+
+Troubleshooting
+Check service status: systemctl status <service-name>
+
+View logs:
+
+Nginx: /var/log/nginx/
+
+Docker: journalctl -u docker
+
+MySQL: /var/log/mysql/
+
+Artifactory: Configured log location
+
+Dependencies
+Ubuntu package manager (apt)
+
+Python for Ansible
+
+Internet connectivity for package installation
+
