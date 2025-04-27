@@ -1,0 +1,29 @@
+- name: config nginx
+  hosts: server
+  become: yes
+  tasks:
+    - name: Install nginx
+      apt:
+        name: nginx
+        update_cache: yes
+
+    - name: Update port
+      lineinfile:
+        path: /etc/nginx/sites-available/default
+        regexp: '^\s*listen\s*\d+'
+        line:     listen {{ lookup('ansible.builtin.env', 'PORT', default='80') }};
+        backrefs: yes
+
+    - name: Render html
+      template:
+        src: index.html.j2
+        dest: /var/www/html/index.html
+
+    - name: Restart nginx
+      service:
+        name: nginx
+        state: restarted
+
+  vars:
+    page_url: "https://www.sheldonbrown.com/web_sample1.html"
+    heading: "Welcome to My Site"
